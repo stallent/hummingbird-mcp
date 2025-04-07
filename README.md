@@ -20,7 +20,7 @@ in this use case
 Run like you would any hummingbird app
 
 ``` 
-run HummingbirdMCP
+swift run HummingbirdMCP
 ```
 
 run the standard MCP Inspector
