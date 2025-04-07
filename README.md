@@ -11,6 +11,10 @@ Very basic example of an MCP server using
 This is not a suggested implementation or design. Purely just the bare minimum to illustrate it working. 
 Look at MCPServer.start() function to see how to configure what the server supports.
 
+IMPORTANT! This won't compile on linux yet until an active PR on https://github.com/modelcontextprotocol/swift-sdk is merged.
+If that gets delayed for some reason you can just fork swift-sdk and comment out the built in transports since neither is needed
+in this use case
+
 ## Running...
 
 Run like you would any hummingbird app
