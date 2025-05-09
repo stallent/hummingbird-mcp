@@ -89,7 +89,7 @@ struct MCPController {
     
     
     @Sendable func messages(request: Request, context: AppRequestContext) async throws -> Response {
-        let sessionId =  try request.uri.queryParameters.require("sessionId", as: UUID.self)
+        let sessionId = try request.uri.queryParameters.require("sessionId", as: UUID.self)
         let body = try await request.body.collect(upTo: .max)
 
         try await self.mcpServerManager.sendToServer(id: sessionId, message: Data(buffer: body))

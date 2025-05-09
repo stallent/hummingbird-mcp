@@ -30,8 +30,13 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     let router = Router(context: AppRequestContext.self)
     
     let mcpServerManagerService = McpServerManager<String>()
+    
     router.addRoutes(
         MCPController(mcpServerManager: mcpServerManagerService).endpoints
+    )
+    
+    router.addRoutes(
+        MCPStreamableController().endpoints
     )
     
     let app = Application(
