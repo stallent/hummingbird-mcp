@@ -12,8 +12,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.3.0"),
-        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.7.1"),
         .package(url: "https://github.com/orlandos-nl/SSEKit.git", from: "1.1.0"),
+        .package(url: "https://github.com/stallent/swift-sdk.git", branch: "streamable_server"),
     ],
     targets: [
         .executableTarget(name: "HummingbirdMCP",

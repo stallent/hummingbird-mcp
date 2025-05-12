@@ -1,5 +1,6 @@
 import Hummingbird
 import Logging
+import MCP
 
 /// Application arguments protocol. We use a protocol so we can call
 /// `buildApplication` inside Tests as well as in the App executable. 
@@ -29,9 +30,13 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     
     let router = Router(context: AppRequestContext.self)
     
-    let mcpServerManagerService = McpServerManager<String>()
+    
     router.addRoutes(
-        MCPController(mcpServerManager: mcpServerManagerService).endpoints
+        StreamableMCPController(path:"mcp/streamer",
+                                stateful: true,
+                                jsonResponses: false) {
+                                    return await Server.configured()
+                                }.endpoints
     )
     
     let app = Application(
@@ -40,7 +45,7 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
             address: .hostname(arguments.hostname, port: arguments.port),
             serverName: "hummingbird_mcp"
         ),
-        services: [mcpServerManagerService],
+        services: [],
         logger: logger
     )
     return app
