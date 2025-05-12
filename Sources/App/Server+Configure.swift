@@ -12,14 +12,14 @@ extension Server {
         
         let server = Server(name: "The Swifties",
                             version: "1.0",
-                            capabilities: Server.Capabilities(logging: nil,
-                                                              prompts: nil,
-                                                              resources: .init(listChanged: false),
-                                                              tools: .init(listChanged: false)),
+                            capabilities: Server.Capabilities(logging: Server.Capabilities.Logging(),
+                                                              prompts: .init(listChanged: true),
+                                                              resources: .init(listChanged: true),
+                                                              tools: .init(listChanged: true)),
                             configuration: .strict)
         
         
-        await server.withMethodHandler(ListTools.self) { context in
+        await server.withMethodHandler(ListTools.self) { id, params  in
             
             let tool1Schema: [String: Value] = ["properties":
                                                     ["param1": ["description": "An example parameter",
@@ -38,31 +38,40 @@ extension Server {
         }
     
         
-        await server.withMethodHandler(CallTool.self) { context in
+        await server.withMethodHandler(CallTool.self) { id, params in
             
-            switch context.name {
+            switch params.name {
                 case "MyTool1":
-                    return CallTool.Result(content: [.text("Tool 1 called with: \(String(describing: context.arguments))")])
+                
+                    try await Task.sleep(for: .seconds(3))
+                    try await server.notify(GenericNotification.message(.init(level: "info", data: "mydata")), requestId: id)
+                
+                    try await Task.sleep(for: .seconds(3))
+                    try await server.notify(GenericNotification.message(.init(level: "info", data: "mydata2")), requestId: id)
+                
+                    try await Task.sleep(for: .seconds(3))
+                
+                    return CallTool.Result(content: [.text("Tool 1 called with: \(String(describing: params.arguments))")])
                 default:
-                    throw MCPError.methodNotFound(context.name)
+                    throw MCPError.methodNotFound(params.name)
             }
             
         }
     
-        await server.withMethodHandler(ListResources.self) { context in
+        await server.withMethodHandler(ListResources.self) { id, params in
             return ListResources.Result(resources: [Resource(name: "MyResource1",
                                                              uri: "cool://resource/bro")])
         }
         
-        await server.withMethodHandler(ReadResource.self) { context in
+        await server.withMethodHandler(ReadResource.self) { id, params in
             
-            switch context.uri {
+            switch params.uri {
                 case "cool://resource/bro":
                     return ReadResource.Result(contents: [Resource.Content.text("hey", uri: "cool://resource/bro" )])
                 
                 default:
                     // no clue if this is an approprate error to throw... but YOLO
-                    throw MCPError.invalidRequest(context.uri)
+                    throw MCPError.invalidRequest(params.uri)
             }
         }
         
