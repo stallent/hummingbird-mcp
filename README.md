@@ -30,5 +30,5 @@ npx @modelcontextprotocol/inspector
 ```
 
 Set transport type to SSE and connect to:
-http://127.0.0.1:8080/mcp/sse 
+http://127.0.0.1:8080/mcp/streamer
 
