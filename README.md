@@ -7,6 +7,8 @@ Very basic example of an MCP server using
 - [https://github.com/orlandos-nl/SSEKit](url)
 
 
+note: currently using a fork of `modelcontextprotocol/swift-sdk` that adds needed code to support this. Will update as it makes its way back into main repo
+
 ## Running...
 
 Run the example app as you would any hummingbird app
