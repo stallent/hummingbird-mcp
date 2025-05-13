@@ -20,7 +20,6 @@ import ServiceLifecycle
 import SSEKit
 import MCP
 import AsyncAlgorithms
-import EventSource
 
 extension HTTPField.Name {
     public static var mcpSessionId: Self { HTTPField.Name("Mcp-Session-Id")! }
