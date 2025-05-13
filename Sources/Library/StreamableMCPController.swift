@@ -20,6 +20,8 @@ import ServiceLifecycle
 import SSEKit
 import MCP
 import AsyncAlgorithms
+import NIOCore
+import NIOFoundationCompat
 
 extension HTTPField.Name {
     public static var mcpSessionId: Self { HTTPField.Name("Mcp-Session-Id")! }
