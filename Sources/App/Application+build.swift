@@ -1,6 +1,7 @@
 import Hummingbird
 import Logging
 import MCP
+import HummingbirdMCP
 
 /// Application arguments protocol. We use a protocol so we can call
 /// `buildApplication` inside Tests as well as in the App executable. 
@@ -29,7 +30,6 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     }()
     
     let router = Router(context: AppRequestContext.self)
-    
     
     router.addRoutes(
         StreamableMCPController(path:"mcp/streamer",

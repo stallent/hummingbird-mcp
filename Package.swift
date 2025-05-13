@@ -7,7 +7,8 @@ let package = Package(
     name: "hummingbird_mcp",
     platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17)],
     products: [
-        .executable(name: "HummingbirdMCP", targets: ["HummingbirdMCP"]),
+        .executable(name: "HummingbirdMCPApp", targets: ["HummingbirdMCPApp"]),
+        .library(name: "HummingbirdMCP", targets: ["HummingbirdMCP"])
     ],
     dependencies: [
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),
@@ -16,14 +17,22 @@ let package = Package(
         .package(url: "https://github.com/stallent/swift-sdk.git", branch: "streamable_server"),
     ],
     targets: [
-        .executableTarget(name: "HummingbirdMCP",
+        .executableTarget(name: "HummingbirdMCPApp",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "MCP", package: "swift-sdk"),
+                .byName(name: "HummingbirdMCP")
+            ],
+            path: "Sources/App"
+        ),
+        .target(name: "HummingbirdMCP",
+            dependencies: [
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "SSEKit", package: "SSEKit"),
                 .product(name: "MCP", package: "swift-sdk"),
             ],
-            path: "Sources/App"
+            path: "Sources/Library"
         ),
         .testTarget(name: "HummingbirdMCPTests",
             dependencies: [

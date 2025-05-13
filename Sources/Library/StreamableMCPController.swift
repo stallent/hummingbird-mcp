@@ -26,9 +26,9 @@ extension HTTPField.Name {
     public static var mcpSessionId: Self { HTTPField.Name("Mcp-Session-Id")! }
 }
 
-typealias serverFactory = @Sendable () async throws -> Server
+public typealias serverFactory = @Sendable () async throws -> Server
 
-struct StreamableMCPController {
+public struct StreamableMCPController<T: RequestContext>:  Sendable{
     
     private let idActor:ServerIDsActor = ServerIDsActor()
     
@@ -37,15 +37,15 @@ struct StreamableMCPController {
     private let jsonResponses:Bool
     private let serverFactory: serverFactory
     
-    init(path:String, stateful:Bool, jsonResponses:Bool, makeServer: @escaping serverFactory) {
+    public init(path:String, stateful:Bool, jsonResponses:Bool, makeServer: @escaping serverFactory) {
         self.path = path
         self.stateful = stateful
         self.jsonResponses = jsonResponses
         self.serverFactory = makeServer
     }
     
-    var endpoints: RouteCollection<AppRequestContext> {
-        let routes = RouteCollection(context: AppRequestContext.self)
+    public var endpoints: RouteCollection<T> {
+        let routes = RouteCollection(context: T.self)
         
         routes
             .get("\(path)", use: mcpGet)
@@ -53,8 +53,9 @@ struct StreamableMCPController {
         
         return routes
     }
+
     
-    @Sendable func mcpPost(request: Request, context: AppRequestContext) async throws -> Response {
+    @Sendable func mcpPost(request: Request, context: T) async throws -> Response {
         guard let accepts = request.headers[HTTPField.Name.accept] else { return .init(status: .notAcceptable)}
         guard accepts.contains("application/json") && accepts.contains("text/event-stream") else { return .init(status: .notAcceptable)}
         
@@ -113,7 +114,7 @@ struct StreamableMCPController {
         
     }
     
-    @Sendable func mcpGet(request: Request, context: AppRequestContext) async throws -> Response {
+    @Sendable func mcpGet(request: Request, context: T) async throws -> Response {
         guard stateful else { return .init(status: .methodNotAllowed)}
         
         guard let sessionId = request.headers[.mcpSessionId] else { return .init(status: .notFound)}
@@ -154,65 +155,5 @@ struct StreamableMCPController {
 }
 
 
-struct ServerRef {
-    let id: UUID
-    let server:Server
-    let transport:StreamableServerTransport
-}
 
-actor ServerIDsActor {
-    var servers:[UUID:ServerRef] = [:]
-    var started:Bool = false
-    
-    func addRef(_ ref: ServerRef) {
-        servers[ref.id] = ref
-        if !started {
-            started = true
-            Task {
-                await self.startNotifiers()
-            }
-        }
-    }
-    
-    func removeRef(_ ref: ServerRef) async throws {
-        await ref.server.stop()
-        servers[ref.id] = nil
-    }
-    
-    func ref(_ serverID: UUID) -> ServerRef? {
-        return servers[serverID]
-    }
-    
-    func ref(_ sessionID: String?) -> ServerRef? {
-        guard let serverID = UUID(uuidString: sessionID ?? "") else { return nil }
-        
-        return servers[serverID]
-    }
-    
-    // Purely for testing periodic notificatons
-    func startNotifiers() async {
-//        do {
-//            let timer = AsyncTimerSequence(interval: .seconds(5), clock: ContinuousClock())
-//            
-//            for await tick in timer {
-//                for ref in servers.values {
-//                    if await ref.transport.isGetConnected() {
-//                        try await ref.server.notify(GenericNotification.message(.init(level: "info", data: "world \(tick)")))
-//                    }
-//                    
-//                }
-//            }
-//        } catch {
-//            
-//        }
-    }
-    
-}
 
-struct GenericNotification: MCP.Notification, Sendable {
-    static var name: String { "notifications/message" }
-    public struct Parameters: Hashable, Codable, Sendable {
-            let level:String
-            let data:String
-        }
-}
