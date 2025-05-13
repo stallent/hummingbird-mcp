@@ -6,15 +6,13 @@ Very basic example of an MCP server using
 - [https://github.com/modelcontextprotocol/swift-sdk](url)
 - [https://github.com/orlandos-nl/SSEKit](url)
 
-Current code is purely for working out streaming server support.
-
 
 ## Running...
 
-Run like you would any hummingbird app
+Run the example app as you would any hummingbird app
 
 ``` 
-swift run HummingbirdMCP
+swift run ExampleMCPApp
 ```
 
 run the standard MCP Inspector
@@ -23,6 +21,20 @@ run the standard MCP Inspector
 npx @modelcontextprotocol/inspector
 ```
 
-Set transport type to SSE and connect to:
+Set transport type to Streamable HTTP and connect to:
 http://127.0.0.1:8080/mcp/streamer
 
+
+Usage:
+
+```swift
+    router.addRoutes(
+        StreamableMCPController(path:"mcp/streamer",
+                                stateful: true,
+                                jsonResponses: false) {
+                                    return await Server.configured()
+                                }.endpoints
+    )
+```
+
+The closure is how a server instance is created.
